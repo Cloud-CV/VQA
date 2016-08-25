@@ -12,14 +12,7 @@ utils = require 'misc.utils'
 require 'xlua'
 require 'image'
 
--- opt.vqa_model = 'model/vqa_model/model_alternating_train_vgg.t7'
--- opt.cnn_proto = 'image_model/VGG_ILSVRC_19_layers_deploy.prototxt'
--- opt.cnn_model = 'image_model/VGG_ILSVRC_19_layers.caffemodel'
--- opt.json_file = 'data/vqa_data_prepro.json'
--- opt.backend = 'cudnn'
--- opt.gpuid = 1
-
-local TorchModel = torch.class('VQATorchModel')
+local TorchModel = torch.class('HieCoattModel')
 
 function TorchModel:__init(vqa_model, cnn_proto, cnn_model, json_file, backend, gpuid)
 
@@ -119,10 +112,10 @@ end
 
 
 
-function TorchModel:predict(img_path, question)
+function TorchModel:predict(input_image, question)
 
   -- load the image
-  local img = image.load(img_path)
+  local img = image.load(input_image)
   -- scale the image
   img = image.scale(img,448,448)
   itorch.image(img)
@@ -165,7 +158,7 @@ function TorchModel:predict(img_path, question)
   print('The answer is: ' .. ans)
 
   result ={}
-  result['img_path'] = img_path
+  result['input_image'] = input_image
   result['question'] = question
   result['answer'] = answer
   return result
