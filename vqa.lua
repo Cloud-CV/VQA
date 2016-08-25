@@ -168,5 +168,6 @@ function TorchModel:predict(img_path, question)
   result['img_path'] = img_path
   result['question'] = question
   result['answer'] = answer
+  return result
 
 end
