@@ -1,0 +1,17 @@
+.brand-logo{
+	font-weight: 300;
+}
+
+.demo_img{
+	height: 300px !important;
+	padding: 6px;
+}
+
+#inputImage{
+	max-width: 100% !important;
+}
+
+#result{
+	font-family: Roboto !important;
+}
+
