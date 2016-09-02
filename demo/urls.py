@@ -1,6 +1,7 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
+from demo import views
 
-urlpatterns = patterns('',
-    url(r'^vqa', 'demo.views.vqa', name='vqa'),
-    url(r'^upload', 'demo.views.file_upload', name='upload'),
-)
+urlpatterns = [
+    url(r'^vqa/', views.vqa, name='vqa'),
+    url(r'^upload/', views.file_upload, name='upload'),
+]
