@@ -22,7 +22,6 @@ function TorchModel:__init(vqa_model, cnn_proto, cnn_model, json_file, backend, 
   self.json_file = json_file
   self.backend = backend
   self.gpuid = gpuid
-
   if self.gpuid >= 0 then
     require 'cutorch'
     require 'cunn'
@@ -32,7 +31,7 @@ function TorchModel:__init(vqa_model, cnn_proto, cnn_model, json_file, backend, 
     cutorch.setDevice(self.gpuid + 1) -- note +1 because lua is 1-indexed
   end
 
-  self.loadModel()
+  self:loadModel()
 
 end
 
@@ -61,7 +60,7 @@ function TorchModel:loadModel()
   self.ix_to_ans = json_file.ix_to_ans
 
   word_to_ix = {}
-  for ix, word in pairs(ix_to_word) do
+  for ix, word in pairs(self.ix_to_word) do
       word_to_ix[word]=ix
   end
 
@@ -108,6 +107,8 @@ function TorchModel:loadModel()
   assert(aparams:nElement() == grad_aparams:nElement())
 
   self.protos = protos
+  self.word_to_ix = word_to_ix
+
 end
 
 
@@ -115,35 +116,44 @@ end
 function TorchModel:predict(input_image, question)
 
   -- load the image
+  print("image path", input_image)
+  print("question", question)
   local img = image.load(input_image)
   -- scale the image
-  img = image.scale(img,448,448)
-  itorch.image(img)
+  img = image.scale(img,224,224)
+  print("image size", img:size())
   img = img:view(1,img:size(1),img:size(2),img:size(3))
+  print("####################   ",img:size(1))
   -- parse and encode the question (in a simple way).
   local ques_encode = torch.IntTensor(26):zero()
-
+  print("A")
   local count = 1
   for word in string.gmatch(question, "%S+") do
       ques_encode[count] = self.word_to_ix[word] or self.word_to_ix['UNK']
       count = count + 1
   end
+  print("A")
+
   ques_encode = ques_encode:view(1,ques_encode:size(1))
   -- doing the prediction
+  print("A")
 
   self.protos.word:evaluate()
   self.protos.phrase:evaluate()
   self.protos.ques:evaluate()
   self.protos.atten:evaluate()
   self.protos.cnn:evaluate()
+  print("A")
 
-  local image_raw = utils.prepro(img, false)
+  local image_raw = utils.prepro(img, true)
+  print("A")
   image_raw = image_raw:cuda()
   ques_encode = ques_encode:cuda()
 
   local image_feat = self.protos.cnn:forward(image_raw)
   local ques_len = torch.Tensor(1,1):cuda()
   ques_len[1] = count-1
+  print("A")
 
   local word_feat, img_feat, w_ques, w_img, mask = unpack(self.protos.word:forward({ques_encode, image_feat}))
   local conv_feat, p_ques, p_img = unpack(self.protos.phrase:forward({word_feat, ques_len, img_feat, mask}))

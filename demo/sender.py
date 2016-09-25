@@ -7,7 +7,7 @@ import sys
 import json
 
 
-def vqa(image_path, question, socketid):
+def vqa_task(image_path, question, socketid):
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=settings.PIKA_HOST))

@@ -15,6 +15,7 @@ import json
 
 # Loading the VQA Model forever
 VQAModel = PyTorchHelpers.load_lua_class(constants.VQA_LUA_PATH, 'HieCoattModel')
+
 VqaTorchModel = VQAModel(
     constants.VQA_CONFIG['vqa_model'],
     constants.VQA_CONFIG['cnn_proto'],
@@ -29,7 +30,7 @@ connection = pika.BlockingConnection(pika.ConnectionParameters(
 
 channel = connection.channel()
 
-channel.queue_declare(queue='vqa_queue', durable=True)
+channel.queue_declare(queue='vqa_task_queue', durable=True)
 print(' [*] Waiting for messages. To exit press CTRL+C')
 
 def callback(ch, method, properties, body):
@@ -37,8 +38,8 @@ def callback(ch, method, properties, body):
     print(" [x] Received %r" % body)
     body = yaml.safe_load(body) # using yaml instead of json.loads since that unicodes the string in value
 
-    result = VqaTorchModel.predict(body['input_image'], body['input_question'])
-    result['input_image'] = str(result['input_image']).replace(settings.BASE_DIR, '')
+    result = VqaTorchModel.predict(body['image_path'], body['question'])
+    result['image_path'] = str(result['image_path']).replace(settings.BASE_DIR, '')
 
     log_to_terminal(body['socketid'], {"terminal": json.dumps(result)})
     log_to_terminal(body['socketid'], {"result": json.dumps(result)})
@@ -47,6 +48,6 @@ def callback(ch, method, properties, body):
     ch.basic_ack(delivery_tag = method.delivery_tag)
 
 channel.basic_consume(callback,
-                      queue='vqa_queue')
+                      queue='vqa_task_queue')
 
 channel.start_consuming()

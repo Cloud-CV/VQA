@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from channels import Group
 
-from demo.sender import vqa
+from demo.sender import vqa_task
 from demo.utils import log_to_terminal
 
 import demo.constants as constants
@@ -29,7 +29,7 @@ def vqa(request, template_name="vqa/vqa.html"):
 
             # Run the VQA wrapper
             log_to_terminal(socketid, {"terminal": "Starting Visual Question Answering job..."})
-            response = grad_cam_vqa(str(abs_image_path), str(input_question), socketid)
+            response = vqa_task(str(abs_image_path), str(input_question), socketid)
         except Exception, err:
             log_to_terminal(socketid, {"terminal": traceback.print_exc()})
 
