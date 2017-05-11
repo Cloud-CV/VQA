@@ -1,21 +1,80 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>CloudCV: Large Scale Distributed Computer Vision as a cloud service</title>
-    <meta name="description" content="CloudCV: Large Scale Distributed Computer Vision as a Cloud Service">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CloudCV: Visual Question Answering Demo">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <!--Open Graph Related Stuff-->
+    <meta property="og:title" content="CloudCV"/>
+    <meta property="og:url" content="https://vqa.cloudcv.org"/>
+    <meta property="og:description" content="CloudCV Visual Question Answering (VQA) Demo"/>
+    <meta property="og:site_name" content="CloudCV"/>
+    <meta property="og:image" content="/static/images/vqa.png"/>
+    <meta property="og:image:url" content="/static/images/vqa.png"/>
+
+    <!--Twitter Card Stuff-->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="CloudCV: Visual Question Answering (VQA) Demo"/>
+    <meta name="twitter:image" content="/static/images/vqa.png"/>
+    <meta name="twitter:url" content="https://vqa.cloudcv.org"/>
+    <meta name="twitter:description" content="CloudCV can answer questions you ask about an image."/>
+
+    <title>CloudCV: Building Platforms for Reproducible AI Research</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="http://cloudcv.org/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
 
     <script src="/static/js/dropzone.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="http://cloudcv.org/static/js/vendor/jquery.ui.widget.js"></script>
-    <script src="http://cloudcv.org/node/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/min/dropzone.min.css">
 </head>
+<script>
+    var job_id = null;
+    var getLocation = function(href) {
+        var l = document.createElement("a");
+        l.href = href;
+        return l;
+    };
+
+    function submitDemoImage(src) {
+        $("#demoType").val("demoImageType");
+        $("#show-grad-cam-result").hide();
+        $("#question").val("");
+        var img_path = getLocation(src).pathname;
+        $("#inputImageAfterUpload").attr('src', img_path);
+        $("#ResultDiv").show();
+        $('#comments').prepend('<br>');
+        $('#comments').prepend('<li>' + "Submitted demo image" + '</li>');
+        scrollToElement($("#termstart"));
+        scrollToElement($("#resultHeading"));
+    }
+
+    function submitImageForVqa() {
+        $("#show-grad-cam-result").hide();
+        var question = $("#question").val();
+        var l = $("#inputImageAfterUpload")[0].src;
+        var img_path = getLocation(l).pathname;
+
+        $.ajax({
+            type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+            url: '{% url 'vqa' %}', // the url where we want to POST
+            data: {
+                'img_path': img_path,
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                'question': question,
+                'socketid': "{{socketid}}",
+                'job_id': job_id
+            } // our data object
+        }).done(function(response) {
+            console.log("Ajax call completed successfully.")
+        });
+    }
+
+</script>
+
 <body>
 
 <div class="navbar navbar-inverse navbar-fixed-top">
@@ -36,7 +95,7 @@
                 <li id = "classification" ><a href="http://cloudcv.org/classify">Classification</a></li>
                 <li id = "poi" ><a href="http://cloudcv.org/vip">VIP</a></li>
                 <li id="trainaclass"><a href="http://cloudcv.org/trainaclass">Train a new category</a></li>
-                <li id="vqa"><a href="http://cloudcv.org/vqa">VQA</a></li>
+                <li id="vqa"><a href="http://vqa.cloudcv.org">VQA</a></li>
             </ul>
         </div>
     </div>
@@ -117,7 +176,7 @@
 
 <div class="container">
     <div class="page-header">
-        <h2>Try Grad-CAM: Sample Images</h2>
+        <h2>Try VQA: Sample Images</h2>
         <br>
         <div class="row">
             <div class="col-md-8 col-xs-12">
@@ -129,19 +188,19 @@
             </div>
         </div>
          <div class="row hiddenDiv demoImages" id="demoImages1">
-            <img src="/media/grad_cam/demo_vqa/COCO_val2014_000000003501.jpg "
+            <img src="/static/images/img1.jpg"
                  onclick="submitDemoImage(this.src)" class="demo_img col-md-4"></img>
-            <img src="/media/grad_cam/demo_vqa/firehydrant.jpg"
+            <img src="/static/images/img2.jpg"
                  onclick="submitDemoImage(this.src)" class="demo_img col-md-4"></img>
-            <img src="/media/grad_cam/demo_vqa/COCO_val2014_000000237618.jpg"
+            <img src="/static/images/img3.jpg"
                  onclick="submitDemoImage(this.src)" class="demo_img col-md-4"></img>
          </div>
          <div class="row hiddenDiv demoImages" id="demoImages2">
-            <img src="/media/grad_cam/demo_vqa/COCO_val2014_000000184402.jpg"
+            <img src="/static/images/img4.jpg"
                  onclick="submitDemoImage(this.src)" class="demo_img col-md-4"></img>
-            <img src="/media/grad_cam/demo_vqa/COCO_val2014_000000393056.jpg"
+            <img src="/static/images/img5.jpg"
                  onclick="submitDemoImage(this.src)" class="demo_img col-md-4"></img>
-            <img src="/media/grad_cam/demo_vqa/COCO_val2014_000000240731.jpg"
+            <img src="/static/images/img6.jpg"
                  onclick="submitDemoImage(this.src)" class="demo_img col-md-4"></img>
             <br>
          </div>
@@ -215,37 +274,7 @@
   </div>
 {% endblock %}
 
-  </div>
-
-<script>
-    var socketid;
-    var demo_running=0;
-
-</script>
-<script>
-    var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-    var isFirefox = typeof InstallTrigger !== 'undefined';
-    var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
-    var isIE = /*@cc_on!@*/false || !!document.documentMode;
-    var isEdge = !isIE && !!window.StyleMedia;
-    var isChrome = !!window.chrome && !!window.chrome.webstore;
-    var isBlink = (isChrome || isOpera) && !!window.CSS;
-    var getUrlParameter = function getUrlParameter(sParam) {
-        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-            sURLVariables = sPageURL.split('&'),
-            sParameterName,
-            i;
-
-        for (i = 0; i < sURLVariables.length; i++) {
-            sParameterName = sURLVariables[i].split('=');
-
-            if (sParameterName[0] === sParam) {
-                return sParameterName[1] === undefined ? true : sParameterName[1];
-            }
-        }
-    };
-
-</script>
+</div>
 
 <script>
   function scrollToElement(dstElement) {
@@ -311,30 +340,9 @@
     $("#question").keypress(function(event) {
         if (event.which == 13) {
           if ($("#question").val().length){
-            console.log("shift focus to answer");
-            $("#answer").focus();
-          }
-        }
-    });
-
-        $("#answer").keypress(function(event) {
-        if (event.which == 13) {
             submitImageForVqa();
             console.log("submited the form");
-        }
-    });
-
-        $("#Caption").keypress(function(event) {
-        if (event.which == 13) {
-            submitImageForCaptioning();
-            console.log("submited the form");
-        }
-    });
-
-        $("#label").keypress(function(event) {
-        if (event.which == 13) {
-            submitImageForClassification();
-            console.log("submited the form");
+          }
         }
     });
 </script>
