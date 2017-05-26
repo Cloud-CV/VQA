@@ -26,6 +26,26 @@ download the spacy English glove vectors from https://nlp.stanford.edu/projects/
 Dataset Download link - http://visualqa.org/download.html
 For more info on data preprocessing checkout the data folder in this directory
 
+## To get started
+Checkout the Readme of every folder.
+
+## Results
+The 2 stacked GRU+CNN model converged faster than the corresponding LSTM over the same training set. I also figured out that the SGD optimizer worked better than RMSProp in  normal LSTMs/GRUs but RMSProp worked better in case of a Time Distributed Layer. GRU with the time distributed layer gave a very low accuracy. 
+
+The models can be improvised way further by training it on the entire dataset for about >100 epochs on a better GPU(Tesla or GTX 1080 ). Overfitting can further be reduced by using Dropout and Regularization. 
+
+Validation Accuracy of LSTM + CNN = 33.77 %
+Validation Accuracy of GRU + CNN = 34.4 %
+Validation Accuracy of LSTM + Time Distributed Layer + CNN = 34.3 %
+
+These accuracies are by training over just 10,000 examples. The accuracy can be improved by training over a larger set every epoch and over a better GPU. Currently trained it on a NVIDIA GTX 960M.
+
+## Some Improvements that can be made
+- Better hyperparameter tuning
+- Dropout
+- Regularization
+- Using a RNN decoder for answers to get answers with temporal semantics
+
 ## References
 - https://arxiv.org/pdf/1505.00468v6.pdf
 - https://github.com/avisingh599/visual-qa
