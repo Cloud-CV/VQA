@@ -11,6 +11,6 @@ Description:
 
 The LSTM outputs a 3d Tensor of Shape (None,23,50) which goes into a Time Distributed Dense Layer giving the shape (None,23,100). This is Reshaped into a 2d Layer of shape (None,23*100) and concatenated with the 4096 image dimensions. The rest of the architecture is the same as others. These type of networks work better with the RMSProp optimizer rather than SGD.
 
-Model: [Link for json file](https://github.com/feziodoshi/VQA/blob/master/keras%20implementation/model/normal_2_lstm_nodistributed_2hidden.json)
+Model: [Link for json file](https://github.com/feziodoshi/VQA/blob/master/keras%20implementation/model/1_lstm_timedistributed_2hidden.json)
 
 Download Link: [Link for downloading the weights of this model](https://drive.google.com/open?id=0B_KG6xVZJiZtRUpoZnhUa3JhZUU)
