@@ -4,7 +4,7 @@ Implementation of the [VQA paper](https://arxiv.org/pdf/1505.00468v6.pdf). Websi
 
 ## Problem Description
 
-Given an image and a natural Language question the task is to give a natural language answer. This is approached by encoding an image in a 4096 dimensional space which can be done by passing it through a VGG model. We will be removing the last 2 convolutional layers in order to get the required dimension. The question can be encoded in 2 ways:
+Given an image and a natural Language question the task is to give a natural language answer. This is approached by encoding an image in a 4096 dimensional space which can be done by passing it through a VGG model. We will be removing the last 2 max pool layers in order to get the required dimension. The question can be encoded in 2 ways:
 - Bag of Words
 - Using Recurrent Neural Networks
 Once the question is encoded, the encoded image and encoded question are merged together and passes through a feed forward deep net. Finally we compute the answers from one of the 1000 classes(as we will take into account only the 1000 most frequently occuring answers).
@@ -34,11 +34,12 @@ The 2 stacked GRU+CNN model converged faster than the corresponding LSTM over th
 
 The models can be improvised way further by training it on the entire dataset for about >100 epochs on a better GPU(Tesla or GTX 1080 ). Overfitting can further be reduced by using Dropout and Regularization. 
 
+
 1. Validation Accuracy of LSTM + CNN = 33.77 %
 2. Validation Accuracy of GRU + CNN = 34.4 %
 3. Validation Accuracy of LSTM + Time Distributed Layer + CNN = 34.3 %
 
-These accuracies are by training over just 10,000 examples. The accuracy can be improved by training over a larger set every epoch and over a better GPU. Currently trained it on a NVIDIA GTX 960M.
+These accuracies are by training over just 10,000 examples. The accuracy can be improved by training over a larger set every epoch and over a better GPU. Currently trained it on a NVIDIA GTX 960M which took around 3 hours to train 10,000 images for 100 epochs.
 
 ## Some Improvements that can be made
 - Better hyperparameter tuning
