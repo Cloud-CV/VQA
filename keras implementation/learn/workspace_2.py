@@ -8,7 +8,6 @@ import tensorflow as tf
 # import scipy .io
 from sklearn.externals import joblib
 from learn.vgg_19_workspace import VGG_19
-import cv2
 
 tf.python.control_flow_ops = tf
 print("Started")
@@ -48,39 +47,6 @@ def recieve_batch(batch_questions,word_embeddings):
 
 
 
-def get_image_model(CNN_weights_file_name):
-    ''' Takes the CNN weights file, and returns the VGG model update
-    with the weights. Requires the file VGG.py inside models/CNN '''
-
-    image_model = VGG_19(CNN_weights_file_name)
-
-
-    sgd = SGD(lr=0.1, decay=0, momentum=0.8, nesterov=False)
-
-
-    image_model.compile(optimizer=sgd, loss='categorical_crossentropy')
-    return image_model
-
-def get_image_features(image_file_name, CNN_weights_file_name):
-    ''' Runs the given image_file to VGG 19 model which can be run alternatively for training the model and returns the
-    weights (filters) as a 1, 4096 dimension vector '''
-    image_model = VGG_19(CNN_weights_file_name)
-
-    image_features = np.zeros((1, 4096))
-    # Magic_Number = 4096  > Comes from last layer of VGG Model
-
-    # Since VGG was trained as a image of 224x224, every new image
-    # is required to go through the same transformation
-    im = cv2.resize(cv2.imread(image_file_name), (224, 224))
-    im = im.transpose((2, 0, 1))  # convert the image to RGBA
-
-    # this axis dimension is required because VGG was trained on a dimension
-    # of 1, 3, 224, 224 (first axis is for the batch size
-    # even though we are using only one image, we have to keep the dimensions consistent
-    im = np.expand_dims(im, axis=0)
-
-    image_features[0, :] = get_image_model(CNN_weights_file_name).predict(im)[0]
-    return image_features
 
 def get_image_features(image_id,im_map,vgg_pre_features):
     num_dim=4096
@@ -91,18 +57,6 @@ def get_image_features(image_id,im_map,vgg_pre_features):
     return image_features
 
 
-# imgind_to_features=open('C:/Users/ezio/Desktop/vqa/features/coco_vgg_IDMap.txt','r').read().splitlines()
-# vgg_model_path='C:/Users/ezio/Desktop/train2014/vgg_model/vgg_feats.mat'
-# features_struct = scipy.io.loadmat(vgg_model_path)
-# VGG_features=features_struct['feats']
-# # x=get_image_features(img_file,weights)
-# x=('524291', '524291')
-# im_feat={}
-# for i in imgind_to_features:
-#     temp=i.split()
-#     im_feat[temp[0]]=int(temp[1])
-# l=get_image_features(x,im_feat,VGG_features)
-# print(l.shape)
 '''
 
 
