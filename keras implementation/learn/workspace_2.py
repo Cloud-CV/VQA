@@ -8,6 +8,7 @@ import tensorflow as tf
 # import scipy .io
 from sklearn.externals import joblib
 from learn.vgg_19_workspace import VGG_19
+import cv2
 
 tf.python.control_flow_ops = tf
 print("Started")
@@ -61,7 +62,7 @@ def get_image_model(CNN_weights_file_name):
     return image_model
 
 def get_image_features(image_file_name, CNN_weights_file_name):
-    ''' Runs the given image_file to VGG 16 model and returns the
+    ''' Runs the given image_file to VGG 19 model which can be run alternatively for training the model and returns the
     weights (filters) as a 1, 4096 dimension vector '''
     image_model = VGG_19(CNN_weights_file_name)
 
