@@ -138,5 +138,5 @@ CHANNEL_LAYERS = {
     },
 }
 
-X_FRAME_OPTIONS = 'https://cloudcv.org/projects/vqa'
+X_FRAME_OPTIONS = 'ALLOW-FROM https://cloudcv.org/projects/vqa'
 
