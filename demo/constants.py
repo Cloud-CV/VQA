@@ -2,8 +2,8 @@ from django.conf import settings
 import os
 
 
-COCO_IMAGES_PATH = os.path.join(settings.MEDIA_ROOT, 'val2014')
-COCO_IMAGES_URL = os.path.join(settings.MEDIA_URL, 'val2014')
+COCO_IMAGES_PATH = os.path.join(settings.MEDIA_ROOT, "val2014")
+COCO_IMAGES_URL = os.path.join(settings.MEDIA_URL, "val2014")
 
 VQA_LUA_PATH = "vqa.lua"
 
