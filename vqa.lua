@@ -12,7 +12,7 @@ utils = require 'misc.utils'
 require 'xlua'
 require 'image'
 
-local TorchModel = torch.class('HieCoattModel')
+local TorchModel = torch.class('VQADemoTorchModel')
 
 function TorchModel:__init(vqa_model, cnn_proto, cnn_model, json_file, backend, gpuid)
 
@@ -22,21 +22,16 @@ function TorchModel:__init(vqa_model, cnn_proto, cnn_model, json_file, backend, 
   self.json_file = json_file
   self.backend = backend
   self.gpuid = gpuid
+
+  print(self.vqa_model, self.cnn_proto, self.cnn_model, self.json_file, self.backend)
   if self.gpuid >= 0 then
     require 'cutorch'
     require 'cunn'
     if self.backend == 'cudnn' then 
     require 'cudnn' 
     end
-    cutorch.setDevice(self.gpuid + 1) -- note +1 because lua is 1-indexed
+    cutorch.setDevice(self.gpuid)
   end
-
-  self:loadModel()
-
-end
-
-
-function TorchModel:loadModel()
 
   local loaded_checkpoint = torch.load(self.vqa_model)
   local lmOpt = loaded_checkpoint.lmOpt
@@ -55,12 +50,13 @@ function TorchModel:loadModel()
   cnnOpt.layer_num = 37
 
   -- load the vocabulary and answers.
+
   local json_file = utils.read_json(self.json_file)
-  self.ix_to_word = json_file.ix_to_word
-  self.ix_to_ans = json_file.ix_to_ans
+  ix_to_word = json_file.ix_to_word
+  ix_to_ans = json_file.ix_to_ans
 
   word_to_ix = {}
-  for ix, word in pairs(self.ix_to_word) do
+  for ix, word in pairs(ix_to_word) do
       word_to_ix[word]=ix
   end
 
@@ -108,52 +104,50 @@ function TorchModel:loadModel()
 
   self.protos = protos
   self.word_to_ix = word_to_ix
-
 end
 
-
-
-function TorchModel:predict(input_image, question)
+function TorchModel:predict(img_path, question)
+  -- specify the image and the question.
+  local img_path = img_path
+  local question = question
 
   -- load the image
-  print("image path", input_image)
-  print("question", question)
-  local img = image.load(input_image)
+  local img = image.load(img_path)
+
   -- scale the image
-  img = image.scale(img,224,224)
-  print("image size", img:size())
+  img = image.scale(img,448,448)
+  -- itorch.image(img)
   img = img:view(1,img:size(1),img:size(2),img:size(3))
-  print("####################   ",img:size(1))
   -- parse and encode the question (in a simple way).
   local ques_encode = torch.IntTensor(26):zero()
-  print("A")
   local count = 1
   for word in string.gmatch(question, "%S+") do
-      ques_encode[count] = self.word_to_ix[word] or self.word_to_ix['UNK']
+    -- check that length of question is <= ques_encode length
+    if count <= 26 then
+      ques_encode[count] = word_to_ix[word] or word_to_ix['UNK']
       count = count + 1
+    end
   end
-  print("A")
 
   ques_encode = ques_encode:view(1,ques_encode:size(1))
   -- doing the prediction
-  print("A")
 
   self.protos.word:evaluate()
   self.protos.phrase:evaluate()
   self.protos.ques:evaluate()
   self.protos.atten:evaluate()
   self.protos.cnn:evaluate()
-  print("A")
 
-  local image_raw = utils.prepro(img, true)
-  print("A")
-  image_raw = image_raw:cuda()
+  local image_raw = utils.prepro(img, false)
+
+  if self.gpuid >= 0 then
+    image_raw = image_raw:cuda()
+  end
   ques_encode = ques_encode:cuda()
 
   local image_feat = self.protos.cnn:forward(image_raw)
   local ques_len = torch.Tensor(1,1):cuda()
   ques_len[1] = count-1
-  print("A")
 
   local word_feat, img_feat, w_ques, w_img, mask = unpack(self.protos.word:forward({ques_encode, image_feat}))
   local conv_feat, p_ques, p_img = unpack(self.protos.phrase:forward({word_feat, ques_len, img_feat, mask}))
@@ -162,15 +156,23 @@ function TorchModel:predict(input_image, question)
   local feature_ensemble = {w_ques, w_img, p_ques, p_img, q_ques, q_img}
   local out_feat = self.protos.atten:forward(feature_ensemble)
 
-  local tmp,pred=torch.max(out_feat,2)
-  local ans = self.ix_to_ans[tostring(pred[1][1])]
+  out_feat_sf = nn.SoftMax():forward(out_feat:double())
+  out_feat_sf = out_feat_sf:squeeze()
+  top5, ix = out_feat_sf:topk(5, true)
 
-  print('The answer is: ' .. ans)
+  top5_answer = {}
+  softmax_score = {}
 
-  result ={}
-  result['input_image'] = input_image
-  result['question'] = question
-  result['answer'] = answer
+  for i=1,5 do
+    local ans = ix_to_ans[tostring(ix[i])]
+    softmax_score[i] = top5[i]
+    top5_answer[i] = ans
+  end
+
+  result = {}
+  result['top5_answer'] = top5_answer
+  result['softmax_score'] = softmax_score
+
   return result
 
 end

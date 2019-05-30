@@ -14,7 +14,6 @@ python-dateutil==2.5.3
 pytz==2016.7
 PyYAML==3.12
 redis==2.10.5
-requests==2.14.2
 scipy==0.17.1
 six==1.10.0
 Twisted==16.4.1
@@ -22,3 +21,5 @@ txaio==2.5.1
 ujson==1.35
 websocket-client==0.37.0
 zope.interface==4.3.2
+psycopg2==2.7.1
+requests==2.14.2

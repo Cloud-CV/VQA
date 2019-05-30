@@ -54,15 +54,20 @@ function utils.count_key(t)
     return count
 end
 
-
 function utils.prepro(im, on_gpu)
   assert(on_gpu ~= nil, 'pass this in. careful here.')
   im=im*255
   local im2=im:clone()
-  print("utils")
-  im2[{{},{3},{},{}}]=im[{{},{1},{},{}}]-123.68
-  im2[{{},{2},{},{}}]=im[{{},{2},{},{}}]-116.779
-  im2[{{},{1},{},{}}]=im[{{},{3},{},{}}]-103.939
+
+  -- Handle the case of grayscale image
+  if im2:size(2) == 1 then
+    im2 = im2:repeatTensor(1,3,1,1)
+  else
+    im2[{{},{3},{},{}}]=im[{{},{1},{},{}}]-123.68
+    im2[{{},{2},{},{}}]=im[{{},{2},{},{}}]-116.779
+    im2[{{},{1},{},{}}]=im[{{},{3},{},{}}]-103.939
+  end
+
   return im2
 end
 
