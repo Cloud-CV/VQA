@@ -89,3 +89,7 @@ ENV/
 .ropeproject
 .vscode/
 *.pyc
+fastText/
+model_data/
+pythia/
+vqa-maskrcnn-benchmark/

@@ -296,7 +296,9 @@ def callback(ch, method, properties, body):
 
 
 if __name__ == "__main__":
+    print('[*] Loading Pythia VQA model class. To exit press CTRL+C')
     demo = PythiaDemo()
+    print('[*] Pythia VQA model successfully loaded. To exit press CTRL+C')
     connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=settings.PIKA_HOST))
 
