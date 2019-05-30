@@ -1,11 +1,15 @@
 {% extends 'base.html' %} {% block header_content %}
-<a href="https://github.com/Cloud-CV/VQA" target="_blank"><img style="position: fixed; top: 0; right: 0; border: 0; z-index:2000;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
+<a href="https://github.com/Cloud-CV/VQA" target="_blank"><img
+        style="position: fixed; top: 0; right: 0; border: 0; z-index:2000;"
+        src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67"
+        alt="Fork me on GitHub"
+        data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
 <div class="container">
     <div class="page-header">
         <h1 align="center">CloudCV: Visual Question Answering (VQA)</h1>
         <font size="4">
             <p>CloudCV can answer questions you ask about an image</p>
-            <p>More details about the VQA dataset can be found <a href="http://visualqa.org/">here.</a> Torch code for VQA is available <a href="//github.com/jiasenlu/HieCoAttenVQA">here</a>.</p>
+            <p>More details about the VQA dataset can be found <a href="http://visualqa.org/">here.</a></p>
             <p>Browsers currently supported by the demo: Google Chrome, Mozilla Firefox.
             </p>
         </font>
@@ -13,45 +17,57 @@
 </div>
 {% endblock %} {% block form %}
 <style type="text/css">
-p, h1, h2, h3, h4, font, body {
-    font-weight: 300 !important;
-    font-family: 'Roboto', sans-serif !important;
-}
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    font,
+    body {
+        font-weight: 300 !important;
+        font-family: 'Roboto', sans-serif !important;
+    }
 
-.caption {
-    font-size: 18px !important;
-    font-weight: bold;
-}
+    .caption {
+        font-size: 18px !important;
+        font-weight: bold;
+    }
 
-#inputAnswer, #predictedAnswer {
-    font-weight: bold;
-}
+    #inputAnswer,
+    #predictedAnswer {
+        font-weight: bold;
+    }
 
-.under {
-    position: absolute;
-    z-index: -1;
-}
+    .under {
+        position: absolute;
+        z-index: -1;
+    }
 
-.over {
-    position: absolute;
-    z-index: 0;
-    mix-blend-mode: multiply;
-}
+    .over {
+        position: absolute;
+        z-index: 0;
+        mix-blend-mode: multiply;
+    }
 
-#gradCamCaption {
-    position: relative;
-    padding-top: 350px;
-}
+    #gradCamCaption {
+        position: relative;
+        padding-top: 350px;
+    }
 
-.finalImages {
-    width: 350px !important;
-    height: 350px !important;
-    padding: 6px;
-}
+    .finalImages {
+        width: 350px !important;
+        height: 350px !important;
+        padding: 6px;
+    }
 
-.resultText {
-    margin-bottom: 15px !important;
-}
+    .resultText {
+        margin-bottom: 15px !important;
+    }
+
+    .vqa_model {
+        padding-bottom: 9px;
+        margin: 40px 0 20px;
+    }
 </style>
 <div class="container">
     <div class="page-header">
@@ -63,77 +79,77 @@ p, h1, h2, h3, h4, font, body {
     </form>
     {% endblock %} {% block result %}
     <script type="text/javascript">
-    // Overriden 
-    Dropzone.options.myDropzone = {
-        autoProcessQueue: true,
-        uploadMultiple: false,
-        maxFiles: 100,
-        acceptedFiles: "image/jpeg,image/png",
+        // Overriden 
+        Dropzone.options.myDropzone = {
+            autoProcessQueue: true,
+            uploadMultiple: false,
+            maxFiles: 100,
+            acceptedFiles: "image/jpeg,image/png",
 
-        init: function() {
-            var myDropzone = this;
+            init: function () {
+                var myDropzone = this;
 
-            myDropzone.on('success', function(file, data) {
-                job_id = data['job_id'];
-                console.log(data);
-                $("#inputImageAfterUpload").attr('src', data['file_path']);
-                $("#ResultDiv").show();
-                $("#show-grad-cam-result").hide();
-                $("#question").val("");
-                scrollToElement($("#termstart"));
-                $('#comments').prepend('<br>');
-                $('#comments').prepend('<li>' + "Image uploaded successfully..." + '</li>');
-                scrollToElement($("#resultHeading"));
-            });
+                myDropzone.on('success', function (file, data) {
+                    job_id = data['job_id'];
+                    console.log(data);
+                    $("#inputImageAfterUpload").attr('src', data['file_path']);
+                    $("#ResultDiv").show();
+                    $("#show-grad-cam-result").hide();
+                    $("#question").val("");
+                    scrollToElement($("#termstart"));
+                    $('#comments').prepend('<br>');
+                    $('#comments').prepend('<li>' + "Image uploaded successfully..." + '</li>');
+                    scrollToElement($("#resultHeading"));
+                });
+            }
         }
-    }
     </script>
     <script type="text/javascript">
-    $(document).ready(function() {
-        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        var socket = new ReconnectingWebSocket(ws_scheme + '://' + window.location.host + "/chat" + window.location.pathname);
+        $(document).ready(function () {
+            var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+            var socket = new ReconnectingWebSocket(ws_scheme + '://' + window.location.host + "/chat" + window.location.pathname);
 
-        socket.onopen = function() {
-            console.log("User connected to the socket with socketid " + "{{socketid}}");
-            socket.send("{{ socketid }}");
-        }
-
-        socket.onmessage = function(response) {
-            console.log("Getting response from the worker.....");
-            console.log(JSON.parse(response.data));
-
-            response = JSON.parse(response.data);
-
-            if ("info" in response) {
-                console.log("Info is there as the key");
+            socket.onopen = function () {
+                console.log("User connected to the socket with socketid " + "{{socketid}}");
+                socket.send("{{ socketid }}");
             }
 
-            if ("terminal" in response) {
-                $('#comments').prepend('<li>' + response['terminal'] + '</li>');
+            socket.onmessage = function (response) {
+                console.log("Getting response from the worker.....");
+                console.log(JSON.parse(response.data));
+
+                response = JSON.parse(response.data);
+
+                if ("info" in response) {
+                    console.log("Info is there as the key");
+                }
+
+                if ("terminal" in response) {
+                    $('#comments').prepend('<li>' + response['terminal'] + '</li>');
+                }
+
+                if ("result" in response) {
+
+                    result = JSON.parse(response['result']);
+                    console.log(result);
+                    var d = new Date();
+                    // $("#overImg1").attr("src", result['img_path']);
+                    top5_answer = result['top5_list'];
+                    $("#progressbar0").css('width', top5_answer[0]['confidence'] + '%').attr('aria-valuenow', top5_answer[0]['confidence']).text(top5_answer[0]['confidence'].toFixed(3) + "%");
+                    $("#progressbar1").css('width', top5_answer[1]['confidence'] + '%').attr('aria-valuenow', top5_answer[1]['confidence']).text(top5_answer[1]['confidence'].toFixed(3) + "%");
+                    $("#progressbar2").css('width', top5_answer[2]['confidence'] + '%').attr('aria-valuenow', top5_answer[2]['confidence']).text(top5_answer[2]['confidence'].toFixed(3) + "%");
+                    $("#progressbar3").css('width', top5_answer[3]['confidence'] + '%').attr('aria-valuenow', top5_answer[3]['confidence']).text(top5_answer[3]['confidence'].toFixed(3) + "%");
+                    $("#progressbar4").css('width', top5_answer[4]['confidence'] + '%').attr('aria-valuenow', top5_answer[4]['confidence']).text(top5_answer[4]['confidence'].toFixed(3) + "%");
+
+                    $("#predictedAnswer0").text(top5_answer[0]['answer']);
+                    $("#predictedAnswer1").text(top5_answer[1]['answer']);
+                    $("#predictedAnswer2").text(top5_answer[2]['answer']);
+                    $("#predictedAnswer3").text(top5_answer[3]['answer']);
+                    $("#predictedAnswer4").text(top5_answer[4]['answer']);
+                    $("#show-grad-cam-result").show();
+                }
             }
-
-            if ("result" in response) {
-
-                result = JSON.parse(response['result']);
-                console.log(result);
-                var d = new Date();
-                // $("#overImg1").attr("src", result['img_path']);
-                top5_answer = result['top5_list'];
-                $("#progressbar0").css('width', top5_answer[0]['confidence'] +'%').attr('aria-valuenow', top5_answer[0]['confidence']).text(top5_answer[0]['confidence'].toFixed(3) + "%");
-                $("#progressbar1").css('width', top5_answer[1]['confidence'] +'%').attr('aria-valuenow', top5_answer[1]['confidence']).text(top5_answer[1]['confidence'].toFixed(3) + "%");
-                $("#progressbar2").css('width', top5_answer[2]['confidence'] +'%').attr('aria-valuenow', top5_answer[2]['confidence']).text(top5_answer[2]['confidence'].toFixed(3) + "%");
-                $("#progressbar3").css('width', top5_answer[3]['confidence'] +'%').attr('aria-valuenow', top5_answer[3]['confidence']).text(top5_answer[3]['confidence'].toFixed(3) + "%");
-                $("#progressbar4").css('width', top5_answer[4]['confidence'] +'%').attr('aria-valuenow', top5_answer[4]['confidence']).text(top5_answer[4]['confidence'].toFixed(3) + "%");
-
-                $("#predictedAnswer0").text(top5_answer[0]['answer']);
-                $("#predictedAnswer1").text(top5_answer[1]['answer']);
-                $("#predictedAnswer2").text(top5_answer[2]['answer']);
-                $("#predictedAnswer3").text(top5_answer[3]['answer']);
-                $("#predictedAnswer4").text(top5_answer[4]['answer']);
-                $("#show-grad-cam-result").show();
-            }
-        }
-    });
+        });
     </script>
     <br>
     <div class="page-header">
@@ -146,7 +162,8 @@ p, h1, h2, h3, h4, font, body {
         </div>
         <div class="col-md-7">
             <div class="col-md-10">
-                <input id="question" class="form-control" name="question" placeholder="Enter the question" required autocomplete="off">                
+                <input id="question" class="form-control" name="question" placeholder="Enter the question" required
+                    autocomplete="off">
             </div>
             <div class="col-md-2">
                 <input type="button" value="Submit" onclick="submitImageForVqa()" class="btn btn-primary">
@@ -160,10 +177,10 @@ p, h1, h2, h3, h4, font, body {
                 </div>
                 <div class="col-md-9">
                     <div class="progress">
-                        <div class="progress-bar" style="color: black;" id="progressbar0" role="progressbar" aria-valuenow="70"
-                        aria-valuemin="0" aria-valuemax="1" >
+                        <div class="progress-bar" style="color: black;" id="progressbar0" role="progressbar"
+                            aria-valuenow="70" aria-valuemin="0" aria-valuemax="1">
                         </div>
-                    </div>                    
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -172,10 +189,10 @@ p, h1, h2, h3, h4, font, body {
                 </div>
                 <div class="col-md-9">
                     <div class="progress">
-                        <div class="progress-bar" style="color: black;" id="progressbar1" role="progressbar" aria-valuenow="70"
-                        aria-valuemin="0" aria-valuemax="1" >
+                        <div class="progress-bar" style="color: black;" id="progressbar1" role="progressbar"
+                            aria-valuenow="70" aria-valuemin="0" aria-valuemax="1">
                         </div>
-                    </div>                    
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -184,10 +201,10 @@ p, h1, h2, h3, h4, font, body {
                 </div>
                 <div class="col-md-9">
                     <div class="progress">
-                        <div class="progress-bar" style="color: black;" id="progressbar2" role="progressbar" aria-valuenow="70"
-                        aria-valuemin="0" aria-valuemax="1" >
+                        <div class="progress-bar" style="color: black;" id="progressbar2" role="progressbar"
+                            aria-valuenow="70" aria-valuemin="0" aria-valuemax="1">
                         </div>
-                    </div>                    
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -196,10 +213,10 @@ p, h1, h2, h3, h4, font, body {
                 </div>
                 <div class="col-md-9">
                     <div class="progress">
-                        <div class="progress-bar" style="color: black;" id="progressbar3" role="progressbar" aria-valuenow="70"
-                        aria-valuemin="0" aria-valuemax="1" >
+                        <div class="progress-bar" style="color: black;" id="progressbar3" role="progressbar"
+                            aria-valuenow="70" aria-valuemin="0" aria-valuemax="1">
                         </div>
-                    </div>                    
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -208,10 +225,10 @@ p, h1, h2, h3, h4, font, body {
                 </div>
                 <div class="col-md-9">
                     <div class="progress">
-                        <div class="progress-bar" style="color: black;" id="progressbar4" role="progressbar" aria-valuenow="70"
-                        aria-valuemin="0" aria-valuemax="1" >
+                        <div class="progress-bar" style="color: black;" id="progressbar4" role="progressbar"
+                            aria-valuenow="70" aria-valuemin="0" aria-valuemax="1">
                         </div>
-                    </div>                    
+                    </div>
                 </div>
             </div>
         </div>
@@ -220,7 +237,8 @@ p, h1, h2, h3, h4, font, body {
     <h2 class="page-header"> Credits </h2>
     <font size="4">
         <a href="https://github.com/jiasenlu/HieCoAttenVQA">Code for VQA Model</a>
-        <br> Built by <a href="http://github.com/DESHRAJ" target="_blank">@deshraj</a>
+        <br> Built by <a href="https://github.com/deshraj"> @deshraj</a> & <a href="https://github.com/RishabhJain2018"
+            target="_blank">@rishabh</a>
         <br>
         <br>
         <br>
@@ -228,7 +246,8 @@ p, h1, h2, h3, h4, font, body {
     <br>
 </div>
 </body>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js"></script>
+<script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js"></script>
 
 </html>
 {% endblock %}

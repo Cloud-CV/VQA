@@ -20,7 +20,7 @@ def vqa(request, template_name="vqa/vqa.html"):
         # get the parameters from client side
         try:
             socketid = request.POST.get('socketid')
-
+            vqa_model = request.POST.get('vqa_model', 'pythia')
             input_question = request.POST.get('question', '')
             input_question = input_question.lower().replace("?", "")
             input_question = "{0} {1}".format(input_question, "?")
@@ -34,7 +34,7 @@ def vqa(request, template_name="vqa/vqa.html"):
 
             # Run the VQA wrapper
             log_to_terminal(socketid, {"terminal": "Starting Visual Question Answering job..."})
-            response = vqa_task(str(abs_image_path), str(input_question), socketid)
+            response = vqa_task(str(abs_image_path), str(input_question), str(vqa_model), socketid)
         except Exception, err:
             log_to_terminal(socketid, {"terminal": traceback.print_exc()})
 
