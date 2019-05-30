@@ -21,7 +21,7 @@
   <meta name="twitter:url" content="https://vqa.cloudcv.org" />
   <meta name="twitter:description" content="CloudCV can answer questions you ask about an image." />
 
-  <title>CloudCV: Building Platforms for Reproducible AI Research</title>
+  <title>CloudCV: Visual Question Answering</title>
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
@@ -30,6 +30,7 @@
   <script src="/static/js/dropzone.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/min/dropzone.min.css">
 </head>
 <script>
@@ -57,7 +58,6 @@
     $("#show-grad-cam-result").hide();
     var question = $("#question").val();
     var vqa_model = $('input[name=vqa_model]:checked').val();
-    console.log(vqa_model);
     var l = $("#inputImageAfterUpload")[0].src;
     var img_path = getLocation(l).pathname;
 
@@ -90,17 +90,24 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/">CloudCV</a>
+        <a class="navbar-brand" href="https://cloudcv.org">CloudCV</a>
       </div>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
-          <li id="image-stitching"><a href="http://cloudcv.org/image-stitch">Image Stitching</a></li>
-          <li id="object-detection"><a href="http://objdetect.cloudcv.org">Object Detection</a></li>
-          <li id="decaf-server"><a href="http://cloudcv.org/decaf-server">Decaf-Server</a></li>
-          <li id="classification"><a href="http://cloudcv.org/classify">Classification</a></li>
-          <li id="poi"><a href="http://cloudcv.org/vip">VIP</a></li>
-          <li id="trainaclass"><a href="http://cloudcv.org/trainaclass">Train a new category</a></li>
-          <li id="vqa"><a href="http://vqa.cloudcv.org">VQA</a></li>
+          <li><a target="_blank" href="https://evalai.cloudcv.org">EvalAI</a></li>
+          <li><a target="_blank" href="http://origami.cloudcv.org">Origami</a></li>
+          <li><a target="_blank" href="http://fabrik.cloudcv.org">Fabrik</a></li>
+          <li><a href="http://gsoc.cloudcv.org">GSoC</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+              aria-expanded="false">Demos <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="http://visualchatbot.cloudcv.org" target="_blank">Visual Chatbot</a></li>
+              <li><a href="http://vqa.cloudcv.org" target="_blank">VQA</a></li>
+              <li><a href="http://gradcam.cloudcv.org" target="_blank">Grad-CAM</a></li>
+              <li><a href="http://dbs.cloudcv.org" target="_blank">DBS</a></li>
+            </ul>
+          </li>
         </ul>
       </div>
     </div>
@@ -230,7 +237,7 @@
   {% block demo_images %}
   <div class=" container">
     <div class="page-header">
-      <h2>Try VQA: Sample Images</h2>
+      <h2>Try VQA on Sample Images</h2>
       <br>
       <div class="row">
         <div class="col-md-8 col-xs-12">
@@ -389,7 +396,18 @@
       }
     });
   </script>
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
+    ga('create', '<google-analytics-id>', 'auto');
+    ga('send', 'pageview');
+
+  </script>
 </body>
 
 </html>
