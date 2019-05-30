@@ -93,3 +93,13 @@ fastText/
 model_data/
 pythia/
 vqa-maskrcnn-benchmark/
+uwsgi.ini
+uwsgi_params
+vqa_nginx.conf
+static/
+models/
+media/
+image_model/VGG_ILSVRC_19_layers.caffemodel
+data/vqa_data_prepro.jso
+image_model/VGG_ILSVRC_19_layers_deploy.prototxt
+image_model/VGG_ILSVRC_19_layers_deploy.prototxt.lua
