@@ -154,13 +154,18 @@
     }
 
     input[type="radio"] {
-      vertical-align: baseline;
+      vertical-align: super;
       width: 5%;
       height: 2%;
       cursor: pointer;
     }
 
     .border-bottom {
+      border-bottom: 1px solid #eee;
+    }
+
+    .choose-model {
+      padding-bottom: 9px;
       border-bottom: 1px solid #eee;
     }
   </style>
@@ -204,7 +209,7 @@
 
   {% block choose_model %}
   <div class="container">
-    <div class="page-header">
+    <div class="choose-model">
       <div class="row">
         <div class="col-md-4">
           <div class="vqa_model">
