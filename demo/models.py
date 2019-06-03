@@ -10,6 +10,7 @@ class QuestionAnswer(models.Model):
     question = models.CharField(max_length=10000, blank=True, null=True)
     created_at = models.DateTimeField("Time", null=True, auto_now_add=True)
     socketid = models.CharField(max_length=10000, blank=True, null=True)
+    vqa_model = models.CharField(max_length=10000, blank=True, null=True)
 
     def __unicode__(self):
         return self.question

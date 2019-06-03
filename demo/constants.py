@@ -16,3 +16,9 @@ VQA_CONFIG = {
     'gpuid' : 1,
     'image_dir': os.path.join(settings.MEDIA_ROOT, 'demo')
 }
+
+SLACK_WEBHOOK_URL = ""
+
+BASE_VQA_DIR_PATH = ""
+
+COCO_PARTIAL_IMAGE_NAME = "COCO_val2014_"

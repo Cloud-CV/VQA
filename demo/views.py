@@ -13,6 +13,7 @@ import random
 import traceback
 import urllib2
 
+COCO_PARTIAL_IMAGE_NAME = constants.COCO_PARTIAL_IMAGE_NAME
 
 def vqa(request, template_name="vqa/vqa.html"):
     socketid = uuid.uuid4()
@@ -34,7 +35,7 @@ def vqa(request, template_name="vqa/vqa.html"):
 
             # Run the VQA wrapper
             log_to_terminal(socketid, {"terminal": "Starting Visual Question Answering job..."})
-            response = vqa_task(str(abs_image_path), str(input_question), str(vqa_model), socketid)
+            vqa_task(str(abs_image_path), str(input_question), str(vqa_model), socketid)
         except Exception, err:
             log_to_terminal(socketid, {"terminal": traceback.print_exc()})
 
@@ -75,7 +76,7 @@ def get_demo_images(demo_images_path):
         demo_images = []
         while(image_count<6):
             random_image = random.choice(os.listdir(demo_images_path))
-            if "COCO_" in random_image:
+            if COCO_PARTIAL_IMAGE_NAME in random_image:
                 demo_images.append(random_image)
                 image_count += 1
 
