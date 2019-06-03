@@ -180,9 +180,9 @@ class PythiaDemo:
 
         model = build_detection_model(cfg)
         checkpoint = torch.load(os.path.join(BASE_VQA_DIR_PATH, 
-            "model_data/detectron_model.pth",
+            "model_data/detectron_model.pth"),
             map_location=torch.device("cpu"),
-        ))
+        )
 
         load_state_dict(model, checkpoint.pop("model"))
 
