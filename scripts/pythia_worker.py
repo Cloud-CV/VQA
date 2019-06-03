@@ -337,9 +337,12 @@ if __name__ == "__main__":
     print('[*] Loading Pythia VQA model class. To exit press CTRL+C')
     demo = PythiaDemo()
     print('[*] Pythia VQA model successfully loaded. To exit press CTRL+C')
+    credentials = pika.PlainCredentials(constants.RABBITMQ_QUEUE_USERNAME, constants.RABBITMQ_QUEUE_PASSWORD)
     connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=settings.PIKA_HOST))
-
+        host=constants.RABBITMQ_HOST_SERVER,
+        port=constants.RABBITMQ_HOST_PORT,
+        virtual_host=constants.RABBITMQ_VIRTUAL_HOST,
+        credentials=credentials))
     channel = connection.channel()
     channel.queue_declare(queue='vqa_demo_task_queue_with_pythia', durable=True)
     print('[*] Waiting for messages. To exit press CTRL+C')
