@@ -301,16 +301,16 @@ def callback(ch, method, properties, body):
     log_to_terminal(body['socketid'], {"result": json.dumps(result)})
     log_to_terminal(body['socketid'], {"terminal": "Completed VQA task"})
     print('[*] Message processed successfully. To exit press CTRL+C')
-    try:
-        QuestionAnswer.objects.create(question=body['question'],
-            image=body['image_path'].replace(settings.BASE_DIR, ""),
-            top5_answer=result['top5_list'],
-            socketid=body['socketid'],
-            vqa_model="pythia")
-    except:
-        print(str(traceback.print_exc()))
+    # try:
+    #     QuestionAnswer.objects.create(question=body['question'],
+    #         image=body['image_path'].replace(settings.BASE_DIR, ""),
+    #         top5_answer=result['top5_list'],
+    #         socketid=body['socketid'],
+    #         vqa_model="pythia")
+    # except:
+    #     print(str(traceback.print_exc()))
 
-    django.db.close_old_connections()
+    # django.db.close_old_connections()
     ch.basic_ack(delivery_tag = method.delivery_tag)
     print('[*] Message successfully deleted. To exit press CTRL+C')
     print('[*] Waiting for new messages. To exit press CTRL+C')
