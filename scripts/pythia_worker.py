@@ -1,9 +1,11 @@
 from __future__ import absolute_import
 import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vqa.settings')
-
+import django
+django.setup()
 from django.conf import settings
 from demo.utils import log_to_terminal
+from demo.models import QuestionAnswer
 import demo.constants as constants
 import pika
 import time
@@ -17,9 +19,16 @@ import gc
 import torch.nn.functional as F
 import pandas as pd
 import sys
+import atexit
+import signal
+import traceback
 
-sys.path.append("/home/ubuntu/VQA/vqa-maskrcnn-benchmark")
-sys.path.append("/home/ubuntu/VQA/pythia")
+django.db.close_old_connections()
+
+BASE_VQA_DIR_PATH = constants.BASE_VQA_DIR_PATH
+
+sys.path.append(os.path.join(BASE_VQA_DIR_PATH, "vqa-maskrcnn-bencmahrk"))
+sys.path.append(os.path.join(BASE_VQA_DIR_PATH, "pythia"))
 
 import torchvision.models as models
 import torchvision.transforms as transforms
@@ -52,7 +61,7 @@ class PythiaDemo:
         self.resnet_model = self._build_resnet_model()
 
     def _init_processors(self):
-        with open("/home/ubuntu/VQA/model_data/pythia.yaml") as f:
+        with open(os.path.join(BASE_VQA_DIR_PATH, "model_data/pythia.yaml")) as f:
             config = yaml.load(f)
 
         config = ConfigNode(config)
@@ -66,12 +75,12 @@ class PythiaDemo:
         text_processor_config = vqa_config.processors.text_processor
         answer_processor_config = vqa_config.processors.answer_processor
 
-        text_processor_config.params.vocab.vocab_file = (
-            "/home/ubuntu/VQA/model_data/vocabulary_100k.txt"
-        )
-        answer_processor_config.params.vocab_file = (
-            "/home/ubuntu/VQA/model_data/answers_vqa.txt"
-        )
+        text_processor_config.params.vocab.vocab_file = (os.path.join(BASE_VQA_DIR_PATH,
+            "model_data/vocabulary_100k.txt"
+        ))
+        answer_processor_config.params.vocab_file = (os.path.join(BASE_VQA_DIR_PATH,
+            "model_data/answers_vqa.txt"
+        ))
         # Add preprocessor as that will needed when we are getting questions from user
         self.text_processor = VocabProcessor(text_processor_config.params)
         self.answer_processor = VQAAnswerProcessor(answer_processor_config.params)
@@ -83,9 +92,9 @@ class PythiaDemo:
         )
 
     def _build_pythia_model(self):
-        state_dict = torch.load("/home/ubuntu/VQA/model_data/pythia.pth")
+        state_dict = torch.load(os.path.join(BASE_VQA_DIR_PATH, "model_data/pythia.pth"))
         model_config = self.config.model_attributes.pythia
-        model_config.model_data_dir = "/home/ubuntu/VQA/model_data/"
+        model_config.model_data_dir = os.path.join(BASE_VQA_DIR_PATH, "model_data/")
         model = Pythia(model_config)
         model.build()
         model.init_losses_and_metrics()
@@ -166,14 +175,14 @@ class PythiaDemo:
 
     def _build_detection_model(self):
 
-        cfg.merge_from_file("/home/ubuntu/VQA/model_data/detectron_model.yaml")
+        cfg.merge_from_file(os.path.join(BASE_VQA_DIR_PATH, "model_data/detectron_model.yaml"))
         cfg.freeze()
 
         model = build_detection_model(cfg)
-        checkpoint = torch.load(
-            "/home/ubuntu/VQA/model_data/detectron_model.pth",
+        checkpoint = torch.load(os.path.join(BASE_VQA_DIR_PATH, 
+            "model_data/detectron_model.pth",
             map_location=torch.device("cpu"),
-        )
+        ))
 
         load_state_dict(model, checkpoint.pop("model"))
 
@@ -273,7 +282,9 @@ def callback(ch, method, properties, body):
 
     print(" [x] Received %r" % body)
     body = yaml.safe_load(body) # using yaml instead of json.loads since that unicodes the string in value
-    path = body["image_path"]
+    image_name = os.path.basename(body['image_path'])
+    image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/val2014")
+    path = os.path.join(image_folder, image_name)
     question = body["question"]
     image_path = demo.get_actual_image(path)
     scores, predictions = demo.predict(path, question)
@@ -290,9 +301,36 @@ def callback(ch, method, properties, body):
     log_to_terminal(body['socketid'], {"result": json.dumps(result)})
     log_to_terminal(body['socketid'], {"terminal": "Completed VQA task"})
     print('[*] Message processed successfully. To exit press CTRL+C')
+    try:
+        QuestionAnswer.objects.create(question=body['question'],
+            image=body['image_path'].replace(settings.BASE_DIR, ""),
+            top5_answer=result['top5_list'],
+            socketid=body['socketid'],
+            vqa_model="pythia")
+    except:
+        print(str(traceback.print_exc()))
+
+    django.db.close_old_connections()
     ch.basic_ack(delivery_tag = method.delivery_tag)
     print('[*] Message successfully deleted. To exit press CTRL+C')
     print('[*] Waiting for new messages. To exit press CTRL+C')
+
+
+def handle_exit():
+    print("Process killed. Sending log to Slack.....")
+    slack_data = {'text': "Pythia VQA demo worker is not working!"}
+    webhook_url = constants.SLACK_WEBHOOK_URL
+    response = requests.post(
+        webhook_url, data=json.dumps(slack_data),
+        headers={'Content-Type': 'application/json'}
+     )
+    if response.status_code != 200:
+        raise ValueError(
+             'Request to slack returned an error %s, the response is:\n%s'
+             % (response.status_code, response.text)
+        )
+atexit.register(handle_exit)
+signal.signal(signal.SIGTERM, handle_exit)
 
 
 if __name__ == "__main__":
