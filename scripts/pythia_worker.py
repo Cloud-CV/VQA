@@ -287,6 +287,8 @@ def callback(ch, method, properties, body):
 
     if "COCO_val2014_" in image_name:
         image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/val2014")
+    elif image_name in ["img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg", "img5.jpg", "img6.jpg", "vqa.png"]:
+        image_folder = os.path.join(BASE_VQA_DIR_PATH, "static/images")
     else:
         IMAGES_BASE_URL = constants.IMAGES_BASE_URL
         image_dir_name = body["image_path"].split("/")[-2]
