@@ -333,7 +333,7 @@ def callback(ch, method, properties, body):
 
 def handle_exit():
     print("Process killed. Sending log to Slack.....")
-    slack_data = {'text': "Pythia VQA demo worker is not working!"}
+    slack_data = {'text': "Pythia model in VQA demo is not working!"}
     webhook_url = constants.SLACK_WEBHOOK_URL
     response = requests.post(
         webhook_url, data=json.dumps(slack_data),
