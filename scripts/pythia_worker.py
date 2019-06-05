@@ -295,7 +295,7 @@ def callback(ch, method, properties, body):
         image_url = os.path.join(IMAGES_BASE_URL, image_dir_name, image_name)
         stored_image_path = os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name, image_name)
         urllib.request.urlretrieve(image_url, stored_image_path)
-        image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/demo")
+        image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name)
 
     path = os.path.join(image_folder, image_name)
     question = body["question"]
