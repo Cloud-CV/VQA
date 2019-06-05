@@ -289,8 +289,9 @@ def callback(ch, method, properties, body):
         image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/val2014")
     else:
         IMAGES_BASE_URL = constants.IMAGES_BASE_URL
-        image_dir_name = body["image_path"].split("/")[-2] 
-        os.mkdir(os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name))
+        image_dir_name = body["image_path"].split("/")[-2]
+        if not os.path.exists(os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name)):
+            os.mkdir(os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name))
         image_url = os.path.join(IMAGES_BASE_URL, image_dir_name, image_name)
         stored_image_path = os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name, image_name)
         urllib.request.urlretrieve(image_url, stored_image_path)
