@@ -202,7 +202,7 @@ class PythiaDemo:
     def _image_transform(self, image_path):
         path = self.get_actual_image(image_path)
 
-        img = Image.open(path)
+        img = Image.open(path).convert("RGB")
         im = np.array(img).astype(np.float32)
         im = im[:, :, ::-1]
         im -= np.array([102.9801, 115.9465, 122.7717])
