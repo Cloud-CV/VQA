@@ -22,6 +22,7 @@ import sys
 import atexit
 import signal
 import traceback
+import urllib.request
 
 django.db.close_old_connections()
 
@@ -283,7 +284,18 @@ def callback(ch, method, properties, body):
     print(" [x] Received %r" % body)
     body = yaml.safe_load(body) # using yaml instead of json.loads since that unicodes the string in value
     image_name = os.path.basename(body['image_path'])
-    image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/val2014")
+
+    if "COCO_val2014_" in image_name:
+        image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/val2014")
+    else:
+        IMAGES_BASE_URL = constants.IMAGES_BASE_URL
+        image_dir_name = body["image_path"].split("/")[-2] 
+        os.mkdir(os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name))
+        image_url = os.path.join(IMAGES_BASE_URL, image_dir_name, image_name)
+        stored_image_path = os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name, image_name)
+        urllib.request.urlretrieve(image_url, stored_image_path)
+        image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/demo")
+
     path = os.path.join(image_folder, image_name)
     question = body["question"]
     image_path = demo.get_actual_image(path)
