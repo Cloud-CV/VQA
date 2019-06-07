@@ -34,7 +34,8 @@ sys.path.append(os.path.join(BASE_VQA_DIR_PATH, "pythia"))
 import torchvision.models as models
 import torchvision.transforms as transforms
 
-from PIL import Image
+from PIL import Image, ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 from io import BytesIO
 
 from pythia.utils.configuration import ConfigNode
