@@ -359,7 +359,9 @@ if __name__ == "__main__":
         port=constants.RABBITMQ_HOST_PORT,
         virtual_host=constants.RABBITMQ_VIRTUAL_HOST,
         credentials=credentials,
-        socket_timeout=10000))
+        socket_timeout=10000,
+        heartbeat=600,
+        blocked_connection_timeout=300))
     channel = connection.channel()
     channel.queue_declare(queue='vqa_demo_task_queue_with_pythia', durable=True)
     print('[*] Waiting for messages. To exit press CTRL+C')
