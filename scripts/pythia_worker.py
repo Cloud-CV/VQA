@@ -296,7 +296,7 @@ def callback(ch, method, properties, body):
     image_name = os.path.basename(body["image_path"])
 
     if constants.COCO_PARTIAL_IMAGE_NAME in image_name:
-        image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/val2014")
+        image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/test2014")
     elif image_name in [
         "img1.jpg",
         "img2.jpg",
