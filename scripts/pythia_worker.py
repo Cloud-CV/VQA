@@ -1,7 +1,9 @@
 from __future__ import absolute_import
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vqa.settings')
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "vqa.settings")
 import django
+
 django.setup()
 from django.conf import settings
 from demo.utils import log_to_terminal
@@ -35,6 +37,7 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 
 from PIL import Image, ImageFile
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 from io import BytesIO
 
@@ -77,12 +80,12 @@ class PythiaDemo:
         text_processor_config = vqa_config.processors.text_processor
         answer_processor_config = vqa_config.processors.answer_processor
 
-        text_processor_config.params.vocab.vocab_file = (os.path.join(BASE_VQA_DIR_PATH,
-            "model_data/vocabulary_100k.txt"
-        ))
-        answer_processor_config.params.vocab_file = (os.path.join(BASE_VQA_DIR_PATH,
-            "model_data/answers_vqa.txt"
-        ))
+        text_processor_config.params.vocab.vocab_file = os.path.join(
+            BASE_VQA_DIR_PATH, "model_data/vocabulary_100k.txt"
+        )
+        answer_processor_config.params.vocab_file = os.path.join(
+            BASE_VQA_DIR_PATH, "model_data/answers_vqa.txt"
+        )
         # Add preprocessor as that will needed when we are getting questions from user
         self.text_processor = VocabProcessor(text_processor_config.params)
         self.answer_processor = VQAAnswerProcessor(answer_processor_config.params)
@@ -94,7 +97,9 @@ class PythiaDemo:
         )
 
     def _build_pythia_model(self):
-        state_dict = torch.load(os.path.join(BASE_VQA_DIR_PATH, "model_data/pythia.pth"))
+        state_dict = torch.load(
+            os.path.join(BASE_VQA_DIR_PATH, "model_data/pythia.pth")
+        )
         model_config = self.config.model_attributes.pythia
         model_config.model_data_dir = os.path.join(BASE_VQA_DIR_PATH, "model_data/")
         model = Pythia(model_config)
@@ -177,12 +182,14 @@ class PythiaDemo:
 
     def _build_detection_model(self):
 
-        cfg.merge_from_file(os.path.join(BASE_VQA_DIR_PATH, "model_data/detectron_model.yaml"))
+        cfg.merge_from_file(
+            os.path.join(BASE_VQA_DIR_PATH, "model_data/detectron_model.yaml")
+        )
         cfg.freeze()
 
         model = build_detection_model(cfg)
-        checkpoint = torch.load(os.path.join(BASE_VQA_DIR_PATH, 
-            "model_data/detectron_model.pth"),
+        checkpoint = torch.load(
+            os.path.join(BASE_VQA_DIR_PATH, "model_data/detectron_model.pth"),
             map_location=torch.device("cpu"),
         )
 
@@ -283,20 +290,34 @@ class PythiaDemo:
 def callback(ch, method, properties, body):
 
     print(" [x] Received %r" % body)
-    body = yaml.safe_load(body) # using yaml instead of json.loads since that unicodes the string in value
-    image_name = os.path.basename(body['image_path'])
+    body = yaml.safe_load(
+        body
+    )  # using yaml instead of json.loads since that unicodes the string in value
+    image_name = os.path.basename(body["image_path"])
 
-    if "COCO_val2014_" in image_name:
+    if constants.COCO_PARTIAL_IMAGE_NAME in image_name:
         image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/val2014")
-    elif image_name in ["img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg", "img5.jpg", "img6.jpg", "vqa.png"]:
+    elif image_name in [
+        "img1.jpg",
+        "img2.jpg",
+        "img3.jpg",
+        "img4.jpg",
+        "img5.jpg",
+        "img6.jpg",
+        "vqa.png",
+    ]:
         image_folder = os.path.join(BASE_VQA_DIR_PATH, "static/images")
     else:
         IMAGES_BASE_URL = constants.IMAGES_BASE_URL
         image_dir_name = body["image_path"].split("/")[-2]
-        if not os.path.exists(os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name)):
+        if not os.path.exists(
+            os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name)
+        ):
             os.mkdir(os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name))
         image_url = os.path.join(IMAGES_BASE_URL, image_dir_name, image_name)
-        stored_image_path = os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name, image_name)
+        stored_image_path = os.path.join(
+            BASE_VQA_DIR_PATH, "media/demo", image_dir_name, image_name
+        )
         urllib.request.urlretrieve(image_url, stored_image_path)
         image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/demo", image_dir_name)
 
@@ -308,15 +329,15 @@ def callback(ch, method, properties, body):
     data = dict(zip(predictions, scores))
     temp_list = []
     for key, value in data.items():
-       temp = {"answer": str(key), "confidence": value} 
-       temp_list.append(temp)
+        temp = {"answer": str(key), "confidence": value}
+        temp_list.append(temp)
     result = {}
     result["top5_list"] = temp_list
     # result['image_path'] = str(result['image_path']).replace(settings.BASE_DIR, '')
-    log_to_terminal(body['socketid'], {"terminal": json.dumps(result)})
-    log_to_terminal(body['socketid'], {"result": json.dumps(result)})
-    log_to_terminal(body['socketid'], {"terminal": "Completed VQA task"})
-    print('[*] Message processed successfully. To exit press CTRL+C')
+    log_to_terminal(body["socketid"], {"terminal": json.dumps(result)})
+    log_to_terminal(body["socketid"], {"result": json.dumps(result)})
+    log_to_terminal(body["socketid"], {"terminal": "Completed VQA task"})
+    print("[*] Message processed successfully. To exit press CTRL+C")
     # try:
     #     QuestionAnswer.objects.create(question=body['question'],
     #         image=body['image_path'].replace(settings.BASE_DIR, ""),
@@ -327,44 +348,52 @@ def callback(ch, method, properties, body):
     #     print(str(traceback.print_exc()))
 
     # django.db.close_old_connections()
-    ch.basic_ack(delivery_tag = method.delivery_tag)
-    print('[*] Message successfully deleted. To exit press CTRL+C')
-    print('[*] Waiting for new messages. To exit press CTRL+C')
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+    print("[*] Message successfully deleted. To exit press CTRL+C")
+    print("[*] Waiting for new messages. To exit press CTRL+C")
 
 
 def handle_exit():
     print("Process killed. Sending log to Slack.....")
-    slack_data = {'text': "Pythia model in VQA demo is not working!"}
+    slack_data = {"text": "Pythia model in VQA demo is not working!"}
     webhook_url = constants.SLACK_WEBHOOK_URL
     response = requests.post(
-        webhook_url, data=json.dumps(slack_data),
-        headers={'Content-Type': 'application/json'}
-     )
+        webhook_url,
+        data=json.dumps(slack_data),
+        headers={"Content-Type": "application/json"},
+    )
     if response.status_code != 200:
         raise ValueError(
-             'Request to slack returned an error %s, the response is:\n%s'
-             % (response.status_code, response.text)
+            "Request to slack returned an error %s, the response is:\n%s"
+            % (response.status_code, response.text)
         )
+
+
 atexit.register(handle_exit)
 signal.signal(signal.SIGTERM, handle_exit)
 
 
 if __name__ == "__main__":
-    print('[*] Loading Pythia VQA model class. To exit press CTRL+C')
+    print("[*] Loading Pythia VQA model class. To exit press CTRL+C")
     demo = PythiaDemo()
-    print('[*] Pythia VQA model successfully loaded. To exit press CTRL+C')
-    credentials = pika.PlainCredentials(constants.RABBITMQ_QUEUE_USERNAME, constants.RABBITMQ_QUEUE_PASSWORD)
-    connection = pika.BlockingConnection(pika.ConnectionParameters(
-        host=constants.RABBITMQ_HOST_SERVER,
-        port=constants.RABBITMQ_HOST_PORT,
-        virtual_host=constants.RABBITMQ_VIRTUAL_HOST,
-        credentials=credentials,
-        socket_timeout=10000,
-        heartbeat=600,
-        blocked_connection_timeout=300))
+    print("[*] Pythia VQA model successfully loaded. To exit press CTRL+C")
+    credentials = pika.PlainCredentials(
+        constants.RABBITMQ_QUEUE_USERNAME, constants.RABBITMQ_QUEUE_PASSWORD
+    )
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(
+            host=constants.RABBITMQ_HOST_SERVER,
+            port=constants.RABBITMQ_HOST_PORT,
+            virtual_host=constants.RABBITMQ_VIRTUAL_HOST,
+            credentials=credentials,
+            socket_timeout=10000,
+            heartbeat=600,
+            blocked_connection_timeout=300,
+        )
+    )
     channel = connection.channel()
-    channel.queue_declare(queue='vqa_demo_task_queue_with_pythia', durable=True)
-    print('[*] Waiting for messages. To exit press CTRL+C')
+    channel.queue_declare(queue="vqa_demo_task_queue_with_pythia", durable=True)
+    print("[*] Waiting for messages. To exit press CTRL+C")
     # Listen to interface
-    channel.basic_consume('vqa_demo_task_queue_with_pythia', callback)
+    channel.basic_consume("vqa_demo_task_queue_with_pythia", callback)
     channel.start_consuming()
