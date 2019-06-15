@@ -222,14 +222,16 @@
           <div class="vqa_model">
             <input checked="checked" id="Pythia" name="vqa_model" type="radio" value="pythia">
             <label for="Pythia"
-              style="font-weight: 300 !important; font-family: 'Roboto' !important; font-size: 30px; cursor: pointer; ">Pythia</label>
+              style="font-weight: 300 !important; font-family: 'Roboto' !important; font-size: 30px; cursor: pointer; ">Pythia<span
+                style="font-size: 15px !important;"> (2018)</span></label>
           </div>
         </div>
         <div class="col-md-4">
           <div class="vqa_model">
             <input name="vqa_model" id="HieCoAtt" type="radio" value="HieCoAtt">
             <label for="HieCoAtt"
-              style="font-weight: 300 !important; font-family: 'Roboto' !important; font-size: 30px; cursor: pointer;">HieCoAtt</label>
+              style="font-weight: 300 !important; font-family: 'Roboto' !important; font-size: 30px; cursor: pointer;">HieCoAtt<span
+                style="font-size: 15px !important;"> (2016)</span></label>
           </div>
         </div>
       </div>
@@ -302,9 +304,7 @@
       <font size="4">
         <ol>
           <li>You upload an image.</li>
-          <li>Your request is sent to our servers with GPUs courtesy NVIDIA.</li>
-          <li>Our servers run our deep-learning based <a class="button_link"
-              onclick="scrollToElement($('#creditSection'))"> algorithm.</a></li>
+          <li>Our servers run the deep-learning based algorithm.</a></li>
           <li>Results and updates are shown in real-time.</li>
         </ol>
       </font><br><br>
@@ -360,6 +360,7 @@
         .done(function (data) {
           data = JSON.parse(data);
           console.log(data);
+          $("#ResultDiv").addClass("");
         });
     }
 
