@@ -295,7 +295,7 @@ def callback(ch, method, properties, body):
     )  # using yaml instead of json.loads since that unicodes the string in value
     image_name = os.path.basename(body["image_path"])
 
-    if image_name.startswith(constants.COCO_PARTIAL_IMAGE_NAME):
+    if image_name.startswith(constants.COCO_PARTIAL_IMAGE_NAME) and image_name[-1].isdigit():
         image_folder = os.path.join(BASE_VQA_DIR_PATH, "media/test2014")
     elif image_name in [
         "img1.jpg",
