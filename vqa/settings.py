@@ -137,3 +137,6 @@ CHANNEL_LAYERS = {
         "ROUTING": "demo.routers.channel_routing",
     },
 }
+
+X_FRAME_OPTIONS = 'ALLOW-FROM https://cloudcv.org/projects/vqa'
+
