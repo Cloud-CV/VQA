@@ -6,7 +6,7 @@ channels==0.17.2
 daphne==0.15.0
 dask==0.11.1
 decorator==4.0.10
-Django==1.10.1
+Django==1.11.28
 msgpack-python==0.4.8
 nltk==3.4.1
 pika==0.10.0
