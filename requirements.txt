@@ -1,6 +1,6 @@
 asgi-redis==0.14.1
 asgiref==0.14.0
-autobahn==0.16.0
+autobahn==20.12.3
 backports.ssl-match-hostname==3.5.0.1
 channels==0.17.2
 daphne==0.15.0
