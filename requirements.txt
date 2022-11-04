@@ -17,7 +17,7 @@ PyYAML==3.12
 redis==2.10.5
 scipy==0.17.1
 six==1.10.0
-Twisted==16.4.1
+Twisted==22.10.0
 txaio==2.5.1
 ujson==1.35
 websocket-client==0.37.0
